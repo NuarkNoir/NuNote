@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">NuNote</string>
+    <string name="add_note">Добавить заметку</string>
+    <string name="create">Создать</string>
+    <string name="save_and_close">Сохранить и закрыть</string>
+    <string name="new_note_title">Название заметки</string>
+    <string name="note_text">Текст заметки</string>
+    <string name="deleting_error">Проблемы с удалением \"{0}\"</string>
+</resources>
