@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(INSTANCE, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             Toast.makeText(INSTANCE, "Requesting access to SD-Card...", Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(INSTANCE, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, 1);
+            recreate();
         }
         checkForDir();
         lv_noteslist = findViewById(R.id.notesList);
