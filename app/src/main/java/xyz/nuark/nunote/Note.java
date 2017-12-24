@@ -3,14 +3,34 @@ package xyz.nuark.nunote;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import in.cubestack.android.lib.storm.FieldType;
+import in.cubestack.android.lib.storm.annotation.Column;
+import in.cubestack.android.lib.storm.annotation.PrimaryKey;
+import in.cubestack.android.lib.storm.annotation.Table;
+
 /**
  * Created by Nuark with love on 15.09.2017.
  * Protected by QPL-1.0
  */
 
+@Table(name = "NOTES_ENTITY")
 public class Note implements Parcelable {
+
+    @PrimaryKey
+    @Column(name="ID", type = FieldType.INTEGER)
     private int ID;
-    private String Name, DateOfCreation, DateOfLastModification;
+
+    @PrimaryKey
+    @Column(name="NAME", type = FieldType.TEXT)
+    private String Name;
+
+    @PrimaryKey
+    @Column(name="DOC", type = FieldType.TEXT)
+    private String DateOfCreation;
+
+    @PrimaryKey
+    @Column(name="DOM", type = FieldType.TEXT)
+    private String DateOfLastModification;
 
     public Note(int ID, String name, String dateOfCreation, String dateOfLastModification) {
         this.ID = ID;
