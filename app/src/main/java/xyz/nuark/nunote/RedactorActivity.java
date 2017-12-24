@@ -19,8 +19,7 @@ import java.util.Locale;
 
 public class RedactorActivity extends AppCompatActivity {
 
-    private EditText et_notetitle;
-    private EditText et_notetext;
+    private EditText et_notetitle, et_notetext;
     Note note;
 
     @Override
@@ -50,7 +49,7 @@ public class RedactorActivity extends AppCompatActivity {
     private void save() {
         String notetitle = et_notetitle.getText().toString().trim();
         if (TextUtils.isEmpty(notetitle)) note.setName("Untitled");
-        String notetext = et_notetext.getText().toString().trim();
+        String notetext = et_notetext.getText().toString();
         note.setDateOfLastModification(new SimpleDateFormat("dd.MM.yy HH꞉mm꞉ss", Locale.getDefault()).format(new Date()));
         try {
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/NuNotes/", note.getPath());

@@ -24,13 +24,12 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 
 import static xyz.nuark.nunote.Globals.readNotesInfo;
-import static xyz.nuark.nunote.Globals.writeNotesInfo;
 
 public class MainActivity extends AppCompatActivity {
 
     public static MainActivity INSTANCE;
     private ListView lv_noteslist;
-    public static GlobalNotesArray gna;
+    public static ArrayList<Note> gna;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         }
         checkForDir();
         lv_noteslist = findViewById(R.id.notesList);
-        gna = new GlobalNotesArray();
+        gna = Globals.readNotesInfo(INSTANCE);
     }
 
     @Override
@@ -57,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private void checkForDir() {
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NuNotes/";
         if (new File(path).exists()) return;
-        new File(path).mkdir();
+        if (!new File(path).mkdir())
+            Toast.makeText(this, "Error while creating notes folder", Toast.LENGTH_SHORT).show();
     }
 
     public void buttonHandler(View view) {
@@ -75,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
             case 1: // Redactor RQ
                 Note note = data.getParcelableExtra("note");
                 System.out.println(note.getName());
-                gna.notes.add(note);
+                gna.add(note);
                 updateList();
                 Toast.makeText(INSTANCE, note.getName() + " saved", Toast.LENGTH_SHORT).show();
-                Globals.writeNotesInfo(INSTANCE);
+                Globals.writeNote(INSTANCE, note);
                 break;
             case 2: // Creator RQ
                 Note note2 = data.getParcelableExtra("note");
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateList() {
-        lv_noteslist.setAdapter(new NotesListAdapter(INSTANCE, gna.notes));
+        lv_noteslist.setAdapter(new NotesListAdapter(INSTANCE, gna));
     }
 }
 
@@ -120,8 +120,8 @@ class NotesListAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 if (Globals.deleteFile(note.getPath())) {
-                    MainActivity.gna.removeNote(i);
-                    writeNotesInfo(context);
+                    MainActivity.gna.remove(i);
+                    Globals.writeNotes(context, MainActivity.gna);
                 }
                 else Toast.makeText(context, MessageFormat.format(context.getString(R.string.deleting_error), note.getName()), Toast.LENGTH_SHORT).show();
             }
@@ -129,7 +129,7 @@ class NotesListAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivity.gna.removeNote(i);
+                MainActivity.gna.remove(i);
                 context.startActivityForResult(new Intent(context, RedactorActivity.class).putExtra("note", note), 1);
             }
         });

@@ -18,7 +18,7 @@ public class Note implements Parcelable {
 
     @PrimaryKey
     @Column(name="ID", type = FieldType.INTEGER)
-    private int ID;
+    public int ID;
 
     @PrimaryKey
     @Column(name="NAME", type = FieldType.TEXT)
