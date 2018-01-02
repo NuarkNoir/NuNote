@@ -5,5 +5,8 @@
     <string name="save_and_close">Сохранить и закрыть</string>
     <string name="new_note_title">Название заметки</string>
     <string name="note_text">Текст заметки</string>
-    <string name="deleting_error">Проблемы с удалением \"{0}\"</string>
+    <string name="str_waiting_for_text_loading">Подождите…</string>
+    <string name="str_note_std_name">Заметка без имени</string>
+    <string name="str_note_created">Создана: {0}</string>
+    <string name="str_note_redacted">Отредактированна: {0}</string>
 </resources>

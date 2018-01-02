@@ -26,18 +26,16 @@ public class RedactorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_redactor);
-        initView();
-        note = getIntent().getExtras().getParcelable("note");
-        et_notetitle.setText(note.getName());
-        et_notetext.setText("Wait...");
         try {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/NuNotes/", note.getPath());
-			String text = Files.toString(file, Charset.defaultCharset());
-            et_notetext.setText(text);
-        } catch (IOException e){
-            et_notetext.setText("");
+            note = getIntent().getExtras().getParcelable("note");
+        } catch (NullPointerException e){
+            System.out.println("Бандл пустой. Норма?");
             e.printStackTrace();
+            finish();
         }
+        initView();
+        et_notetitle.setText(note.getName());
+        et_notetext.setText(note.getText());
 
     }
 
@@ -47,18 +45,12 @@ public class RedactorActivity extends AppCompatActivity {
     }
 
     private void save() {
-        String notetitle = et_notetitle.getText().toString().trim();
-        if (TextUtils.isEmpty(notetitle)) note.setName("Untitled");
-        String notetext = et_notetext.getText().toString();
+        String note_title = et_notetitle.getText().toString().trim();
+        if (note_title.length() <= 0)
+            note.setName(getString(R.string.str_note_std_name));
         note.setDateOfLastModification(new SimpleDateFormat("dd.MM.yy HH꞉mm꞉ss", Locale.getDefault()).format(new Date()));
-        try {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/NuNotes/", note.getPath());
-            if (!file.exists()) file.createNewFile();
-            Files.write(notetext.getBytes(), file);
-        } catch (IOException e) {}
-        Intent intent = new Intent();
-        intent.putExtra("note", note);
-        setResult(RESULT_OK, intent);
+        note.setText(et_notetext.getText().toString().trim());
+        setResult(RESULT_OK, new Intent().putExtra("note", note).putExtra("old", note.getId()));
         finish();
     }
 
