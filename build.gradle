@@ -2,7 +2,7 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url "http://dl.bintray.com/cubestack/maven" }
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.0-alpha06'
@@ -13,7 +13,7 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven { url "http://dl.bintray.com/cubestack/maven" }
+        mavenCentral()
     }
 }
 

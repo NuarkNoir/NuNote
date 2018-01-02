@@ -1,63 +1,36 @@
 package xyz.nuark.nunote;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
-import static xyz.nuark.nunote.Globals.readNotesInfo;
-import static xyz.nuark.nunote.Globals.writeNotesInfo;
+import static com.orm.SugarContext.init;
 
 public class MainActivity extends AppCompatActivity {
 
     public static MainActivity INSTANCE;
+    public static ArrayList<Note> notesList;
     private ListView lv_noteslist;
-    public static GlobalNotesArray gna;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        init(this); // Initialization of Sugar ORM
         setContentView(R.layout.activity_main);
         INSTANCE = this;
-        if (ContextCompat.checkSelfPermission(INSTANCE, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(INSTANCE, "Requesting access to SD-Card...", Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(INSTANCE, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, 1);
-            recreate();
-        }
-        checkForDir();
         lv_noteslist = findViewById(R.id.notesList);
-        gna = new GlobalNotesArray();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        readNotesInfo(INSTANCE);
-        updateList();
-    }
-
-    private void checkForDir() {
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NuNotes/";
-        if (new File(path).exists()) return;
-        new File(path).mkdir();
+        updateNotesAndList();
     }
 
     public void buttonHandler(View view) {
@@ -71,83 +44,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data == null) {return;}
+        Note note;
         switch (requestCode) {
             case 1: // Redactor RQ
-                Note note = data.getParcelableExtra("note");
-                System.out.println(note.getName());
-                gna.notes.add(note);
-                updateList();
-                Toast.makeText(INSTANCE, note.getName() + " saved", Toast.LENGTH_SHORT).show();
-                Globals.writeNotesInfo(INSTANCE);
+                long old_note_id = data.getLongExtra("old", 1000000000L);
+                deleteNote(old_note_id);
+                note = data.getParcelableExtra("note");
+                Toast.makeText(INSTANCE, MessageFormat.format("[{0}] {1} saved", note.getId(), note.getName()), Toast.LENGTH_SHORT).show();
+                saveNote(note);
                 break;
             case 2: // Creator RQ
-                Note note2 = data.getParcelableExtra("note");
-                INSTANCE.startActivityForResult(new Intent(INSTANCE, RedactorActivity.class).putExtra("note", note2), 1);
+                note = data.getParcelableExtra("note");
+                INSTANCE.startActivityForResult(new Intent(INSTANCE, RedactorActivity.class).putExtra("note", note), 1);
                 break;
         }
     }
 
-    public void updateList() {
-        lv_noteslist.setAdapter(new NotesListAdapter(INSTANCE, gna.notes));
-    }
-}
-
-class NotesListAdapter extends BaseAdapter {
-
-    private final Activity context;
-    private final ArrayList<Note> notes;
-
-    public NotesListAdapter(Activity context, ArrayList<Note> notes) {
-        this.context = context;
-        this.notes = notes;
+    public void updateNotesAndList() {
+        notesList = (ArrayList<Note>) Note.listAll(Note.class);
+        lv_noteslist.setAdapter(new NotesListAdapter(INSTANCE, notesList));
     }
 
-    @Override
-    public View getView(final int i, View view, ViewGroup viewGroup) {
-        if (view == null) {
-            LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = mInflater.inflate(R.layout.note_item, null);
+    public void saveNote(Note note) {
+        note.save();
+        updateNotesAndList();
+    }
+
+    public void deleteNote(long id) {
+        try {
+            Note.findById(Note.class, id).delete();
+            updateNotesAndList();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        final Note note = getItem(i);
-        TextView tv_notetitle = view.findViewById(R.id.tv_notetitle);
-        TextView tv_notecreationtime = view.findViewById(R.id.tv_notecreationtime);
-        TextView tv_noteredactedtime = view.findViewById(R.id.tv_noteredactedtime);
-        tv_notetitle.setText(note.getName());
-        tv_notecreationtime.setText(MessageFormat.format("Создана: {0}", note.getDateOfCreation()));
-        tv_noteredactedtime.setText(MessageFormat.format("Отредактированна: {0}", note.getDateOfLastModification()));
-        ImageButton btn_delete = view.findViewById(R.id.btn_delete);
-        btn_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Globals.deleteFile(note.getPath())) {
-                    MainActivity.gna.removeNote(i);
-                    writeNotesInfo(context);
-                }
-                else Toast.makeText(context, MessageFormat.format(context.getString(R.string.deleting_error), note.getName()), Toast.LENGTH_SHORT).show();
-            }
-        });
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MainActivity.gna.removeNote(i);
-                context.startActivityForResult(new Intent(context, RedactorActivity.class).putExtra("note", note), 1);
-            }
-        });
-        return view;
     }
 
-    @Override
-    public int getCount() {
-        return notes.size();
-    }
-
-    @Override
-    public Note getItem(int i) {
-        return notes.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
+    public void deleteNote(Note note) {
+        deleteNote(note.getId());
     }
 }
+

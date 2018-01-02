@@ -26,10 +26,10 @@
             android:layout_height="wrap_content"
             android:hint="@string/new_note_title"
             android:maxLines="1"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:enabled="false"/>
 
     </android.support.design.widget.TextInputLayout>
-
     <ScrollView
         android:id="@+id/textInputLayout2"
         android:layout_width="0dp"
@@ -51,7 +51,7 @@
             android:inputType="textCapSentences|textMultiLine"
             android:scrollHorizontally="false"
             android:scrollbars="vertical"
-            android:singleLine="false" />
+            android:singleLine="false"/>
 
     </ScrollView>
 

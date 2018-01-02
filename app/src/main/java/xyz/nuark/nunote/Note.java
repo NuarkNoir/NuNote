@@ -3,53 +3,82 @@ package xyz.nuark.nunote;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.orm.SugarRecord;
+import com.orm.dsl.Unique;
+
 /**
  * Created by Nuark with love on 15.09.2017.
  * Protected by QPL-1.0
  */
 
-public class Note implements Parcelable {
-    private int ID;
-    private String Name, DateOfCreation, DateOfLastModification;
+public class Note  extends SugarRecord implements Parcelable {
 
-    public Note(int ID, String name, String dateOfCreation, String dateOfLastModification) {
-        this.ID = ID;
+    @Unique
+    private Long Id;
+    private String Name;
+    private String DateOfCreation;
+    private String DateOfLastModification;
+    private String Text;
+
+    public Note() {} // SugarORM needs empty constructor for some reasons
+
+    public Note(Long id, String name, String dateOfCreation, String dateOfLastModification, String text) {
+        Id = id;
         Name = name;
-        DateOfCreation = dateOfCreation.replace(" ", ".");
-        DateOfLastModification = dateOfLastModification.replace(" ", ".");
+        DateOfCreation = dateOfCreation;
+        DateOfLastModification = dateOfLastModification;
+        Text = text;
     }
 
-    private String sanitize(String name){
-        return name.trim()
-                .replace("\\", "_")
-                .replace("/", "_")
-                .replace(":", "꞉")
-                .replace("*", "_")
-                .replace("?", "_")
-                .replace("\"", "_")
-                .replace("<", "_")
-                .replace(">", "_")
-                .replace("|", "_")
-                .replace("+", "_")
-                .replace("%", "_")
-                .replace("!", "_")
-                .replace("@", "_")
-                .replace("\\", "_");
+    public Long getId() {
+        return Id;
     }
+
+    public String getName() {
+        return Name;
+    }
+
+    public String getDateOfCreation() {
+        return DateOfCreation;
+    }
+
+    public String getDateOfLastModification() {
+        return DateOfLastModification;
+    }
+
+    public String getText() {
+        return Text;
+    }
+
+    public void setText(String text) {
+        Text = text;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public void setDateOfLastModification(String dateOfLastModification) {
+        DateOfLastModification = dateOfLastModification;
+    }
+
+    // Parcelable area
 
     private Note(Parcel in) {
-        ID = in.readInt();
+        Id = in.readLong();
         Name = in.readString();
         DateOfCreation = in.readString();
         DateOfLastModification = in.readString();
+        Text = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(ID);
+        dest.writeLong(Id);
         dest.writeString(Name);
         dest.writeString(DateOfCreation);
         dest.writeString(DateOfLastModification);
+        dest.writeString(Text);
     }
 
     @Override
@@ -68,28 +97,4 @@ public class Note implements Parcelable {
             return new Note[size];
         }
     };
-
-    public String getName() {
-        return Name;
-    }
-
-    public String getPath() {
-        return sanitize(ID + "." + Name.replace(" ", "") + "_" + DateOfCreation.replace(" ", "_") + ".txt");
-    }
-
-    public String getDateOfCreation() {
-        return DateOfCreation;
-    }
-
-    public String getDateOfLastModification() {
-        return DateOfLastModification;
-    }
-
-    public void setName(String name) {
-        Name = name;
-    }
-
-    public void setDateOfLastModification(String dateOfLastModification) {
-        DateOfLastModification = dateOfLastModification;
-    }
 }

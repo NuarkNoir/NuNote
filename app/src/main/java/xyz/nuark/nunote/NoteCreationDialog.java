@@ -24,9 +24,9 @@ public class NoteCreationDialog extends AppCompatActivity {
 
     public void createNote(View view) {
         String notetitle = et_newnotetitle.getText().toString().trim();
-        if (TextUtils.isEmpty(notetitle)) notetitle = "Untitled";
+        if (TextUtils.isEmpty(notetitle)) notetitle = getString(R.string.str_note_std_name);
         String date = new SimpleDateFormat("dd.MM.yy HH꞉mm꞉ss", Locale.getDefault()).format(new Date());
-        Note note = new Note(MainActivity.gna.notes.size(), notetitle, date, date);
+        Note note = new Note(Long.parseLong(String.valueOf(Note.listAll(Note.class).size())), notetitle, date, date, "");
         System.out.println(note.toString());
         Intent intent = new Intent();
         intent.putExtra("note", note);
