@@ -7,8 +7,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.common.collect.Lists;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateNotesAndList() {
-        notesList = Lists.newArrayList(Note.findAll(Note.class));
+        notesList = (ArrayList<Note>) Note.listAll(Note.class);
         lv_noteslist.setAdapter(new NotesListAdapter(INSTANCE, notesList));
     }
 

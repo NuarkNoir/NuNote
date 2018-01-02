@@ -2,17 +2,10 @@ package xyz.nuark.nunote;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.common.io.Files;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
