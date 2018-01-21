@@ -7,7 +7,7 @@ android {
         applicationId "xyz.nuark.nunote"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 28
+        versionCode 29
         versionName "1.4"
         project.ext.set("archivesBaseName", "NuNote " + defaultConfig.versionName)
     }
